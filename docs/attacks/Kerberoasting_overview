@@ -12,7 +12,9 @@ python3 GetSPNs.py -request -dc-ip 10.0.10.10 enterprise.local/Administrator
 - *Goal*: Request TGS tickets for service accounts (SPNs).
 
 *Attack Details*
-1. From Kali, queried SPNs with `setspn -q */*` to find `MSSQLSvc/DC.enterprise.local`.
-2. Ran `GetSPNs.py` to request TGS ticket for the SPN.
-3. Traffic was *blocked by pfSense firewall* (no traffic reached DC).
-4. No alerts in Wazuh (expected, since attack didn't reach host).
+
+Execution of impacket-GetUserSPNs against EVILCORP.LOCAL to request a TGS for the svc-iis service account. The tool returned a Kerberos TGS hash ready for offline cracking.
+see: (KERB_ATTACK.png) 
+
+Successful offline cracking of the TGS hash with hashcat using rockyou.txt and toggles1.rule. Status Cracked confirms the service account password was recovered: Password123!.
+see: (KERB_RESULT)
