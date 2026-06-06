@@ -11,7 +11,7 @@ impacket-GetUserSPNs EVILCORP.LOCAL/Orazio.Grinzosi:'Password123!' -dc-ip 10.0.1
 ![KERB_ATTACK.png](KERB_ATTACK.png)
 _Figure 1: Output of `impacket-GetUserSPNs`. The request for `svc-iis` succeeds and returns a Kerberos TGS hash type `$krb5tgs$23$. This hash is ready for offline cracking with hashcat. Note: the`svc-iis`account has`ADMIN_COUNT=1` but is not protected by a complex password._
 
-2. *Offline Cracking with Hashcat*
+### 2. Offline Cracking with Hashcat
 The extracted hash is saved to `svc-iis.hash` and cracked using `hashcat` in mode 13100. We use the `rockyou.txt` wordlist + `toggles1.rule` rules to handle common password variants.
 
 
