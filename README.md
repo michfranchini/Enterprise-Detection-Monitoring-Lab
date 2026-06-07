@@ -66,7 +66,7 @@ Unlike classic SIEM labs, this one implements a custom **SOAR** layer: when Wazu
 
 ## Future Improvements
 
-- [ ] MITRE ATT&CK mapping for each scenario
-- [ ] Integration with TheHive for case management
-- [ ] Response playbook for Kerberoasting
-- [ ] Grafana dashboard for MTTD/MTTR metrics
+- [ ] **MITRE ATT&CK mapping for each scenario**
+- [ ] **Integration with TheHive for case management**
+- [ ] **Response playbook for Kerberoasting**
+- [ ] **Grafana dashboard for MTTD/MTTR metrics**
