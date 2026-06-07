@@ -34,7 +34,7 @@ User activity
 
 
 
-![Figure 2: Successful deployment of Wazuh agent on monitored Windows endpoint.](/screenshots/WAZUH_ON_WINDOWS.png)
+![Figure 2: Successful deployment of Wazuh agent on monitored Windows endpoint.](/attacks/screenshots/WAZUH_ON_WINDOWS.png)
 
 
 ## Detection Validation
