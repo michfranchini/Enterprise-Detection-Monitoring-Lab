@@ -1,41 +1,21 @@
-## SOAR: Automated Response with Wazuh and pfSense
-This document explains how Wazuh Manager on Linux detects brute force attacks and automatically blocks the attacker via pfSense.
+## SOAR: Automated Response with Wazuh Active Response + pfSense
 
-### 1. Detection and Alerting
-Wazuh Manager on Linux collects logs from the Windows agent and triggers Rule `60122` when multiple failed logons are detected.
+This document covers the SOAR implementation. When Wazuh detects a brute force attack via Rule 60122, it automatically executes a script to block the attacker's IP on the pfSense firewall. Zero manual intervention.
 
-![Figure 1: Wazuh Manager Alert](./screenshots/WAZUH_MANAGER_ALERT.png)
-*Figure 1: Wazuh Manager showing Rule 60122 alert for brute force attack.*
+### 1. Active Response Configuration: `/var/ossec/etc/ossec.conf`
 
-### 2. Active Response Script
-When triggered, Wazuh executes a custom script located at `/var/ossec/active-response/bin/pfblock.sh` on the Linux Manager.
+The Wazuh Manager is configured to trigger a custom script when Rule `60122` fires. This rule corresponds to "Logon failure - Unknown user or bad password", i.e., Windows Event ID 4625.
 
-![Figure 2: Active Response Script](./screenshots/ACTIVE_RESPONSE_SCRIPT.png)
-*Figure 2: `pfblock.sh` script that connects to pfSense via SSH and blocks the attacker's IP using `easyrule`.*
+![Figure 1: Active Response Configuration](./screenshots/OSSEC_ACTIVE_RESPONSE_CONFIG.png)
+*Figure 1: `ossec.conf` defines the `pfblock` command and links it to Rule 60122.*
 
-**Script Breakdown**:
-bash
-#!/bin/bash
-IP=$1
-ACTION=$2
-PFSENSE="10.0.10.1"
-
-if [ "$ACTION" = "add" ]; then
-    ssh -o StrictHostKeyChecking=no admin@$PFSENSE "easyrule block wan ${IP}"
-else
-    ssh -o StrictHostKeyChecking=no admin@$PFSENSE "easyrule unblock wan ${IP}"
-fi
-
-- `$1` is the attacker's IP (passed by Wazuh).
-- `$2` is `add` (block) or `delete` (unblock).
-- `easyrule` is a pfSense command to block/unblock IPs.
-
-3. *Configuration in `ossec.conf`*
-The Active Response is configured in `/var/ossec/etc/ossec.conf` on the Wazuh Manager.
-
-!/screenshots/WAZUH_OSSEC_CONFIG.png
-Figure 3: `ossec.conf` linking Rule 60122 to the `pfblock.sh` script.
-
+**Configuration breakdown**:
+```xml
+<command>
+  <name>pfblock</name>
+  <executable>pfblock.sh</executable>
+  <timeout_allowed>yes</timeout_allowed>
+</command>
 
 <active-response>
   <command>pfblock</command>
@@ -44,27 +24,30 @@ Figure 3: `ossec.conf` linking Rule 60122 to the `pfblock.sh` script.
   <timeout>600</timeout>
 </active-response>
 
-<command>
-  <name>pfblock</name>
-  <executable>pfblock.sh</executable>
-  <expect>srcip</expect>
-</command>
+<rules_id>60122</rules_id>: Triggers on brute force detection.
+<location>server</location>: The script runs on the Wazuh Manager itself.
+<timeout>600</timeout>: The IP is blocked for 10 minutes, then automatically unblocked.<executable>pfblock.sh</executable>: The script responsible for firewall interaction.
 
-- *Rule 60122*: Brute force detection.
-- *Command*: Executes `pfblock.sh` on the Manager.
-- *Timeout*: Blocks IP for 10 minutes (600 seconds).
+### 2.Response Script: 
 
-4. *Result on pfSense*
-The attacker's IP `10.0.20.102` is automatically blocked by pfSense.
+/var/ossec/active-response/bin/pfblock.shThis Bash script receives the attacker's IP from Wazuh and uses SSH to execute easyrule on pfSense.
 
-!/screenshots/PFSENSE_BLOCK_RESULT.png
-_Figure 4: pfSense firewall showing `10.0.20.102` blocked by the `easyrule` command._
+![Figure 2: pfblock.sh Active Response Script](./screenshots/ACTIVE_RESPONSE_SCRIPT.png)
+*Figure 2: The script blocks the IP via `easyrule block` wan and logs the action. It auto-unblocks after the timeout.
 
-5. *Conclusion*
-This SOAR workflow demonstrates:
-1. Wazuh detects brute force on Windows via Event ID 4625.
-2. Wazuh Manager on Linux triggers an Active Response.
-3. The script blocks the attacker at the firewall level (pfSense).
-4. The IP is blocked for 10 minutes, then automatically unblocked.
+**Script logic:** 
 
-This automated response reduces response time from hours to seconds.
+IP=$1: Wazuh passes the attacker's source IP as the first argument.
+ACTION=$2: Wazuh passes add to block, or delete to unblock after timeout.
+ssh admin@10.0.10.1 "easyrule block wan ${IP}": Connects to pfSense 10.0.10.1 and creates a firewall rule to drop all traffic from the attacker's IP.
+All actions are logged to /var/ossec/logs/active-responses.log for auditability.
+
+### 3. End-to-End Workflow
+
+Attack: Hydra from 10.0.20.102 generates multiple Event ID 4625 on the DC.
+Detection: Wazuh Agent forwards logs. Wazuh Manager correlates and triggers Rule 60122.
+Response: The Active Response module executes pfblock.sh add 10.0.20.102.
+Mitigation: pfSense instantly blocks 10.0.20.102. Attack is contained in < 3 seconds.
+Recovery: After 600 seconds, Wazuh executes pfblock.sh delete 10.0.20.102 to auto-unblock.
+
+Result: This closed-loop remediation turns the SIEM into an active defense system, reducing Mean Time to Respond (MTTR) from hours to seconds.
