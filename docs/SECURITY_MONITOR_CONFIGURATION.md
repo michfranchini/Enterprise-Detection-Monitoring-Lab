@@ -36,11 +36,11 @@ Live attack simulations were executed to prove the monitoring stack can detect c
 #### Kerberoasting Activity (T1558.003)
 
 **Observed Indicators:**
-- Event ID 4769 generated during TGS requests with `Ticket Encryption Type: 0x17` (RC4)
-- Weak encryption usage identified and forwarded to Wazuh for alerting
+- Execution of `impacket-GetUserSPNs` to request TGS tickets for service account `svc-iis`
+- Event ID 4769 generated with `Ticket Encryption Type: 0x17` (RC4) on the DC
 
 ![Figure 3: Kerberoasting Detection Evidence](./attacks/screenshots/KERBEROASTING_HASHCAT.png)
-*Figure 3: TGS ticket successfully extracted and cracked offline. Confirms the Kerberoasting attack path is viable and detectable via Event ID 4769.*
+*Figure 3: `impacket-GetUserSPNs` used to request a TGS for `HTTP/webapp.EVILCORP.LOCAL`. This action triggers Event ID 4769, which Wazuh captures for detection.*
 
 #### Brute Force Activity (T1110)
 
