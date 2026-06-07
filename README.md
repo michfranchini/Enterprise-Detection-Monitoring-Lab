@@ -1,6 +1,6 @@
-# Enterprise Detection & Monitoring Lab | SIEM + SOAR + Active Defense
+# SOC Blue Team Project: Detecting Brute Force & Kerberoasting with Wazuh Active Response
 
-> **TL;DR**: An enterprise lab that doesn't just *detect* attacks. It **blocks them automatically**.
+> **TL;DR**: My little experiment for an enterprise lab that doesn't just *detect* attacks. It **blocks them automatically**. Suggestions are encouraged. 
 >
 > Wazuh SIEM for detection + Active Response on pfSense for mitigation = Full SOC workflow.
 
