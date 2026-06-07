@@ -14,7 +14,7 @@ A dedicated AlmaLinux VM serves as the centralized SIEM for log aggregation, cor
 - Rule-based alert correlation for TTP detection
 - Log retention for forensic analysis
 
-![Figure 1: Wazuh Manager Service Status](./screenshots/WAZUH_MANAGER.png)
+![Figure 1: Wazuh Manager Service Status](./attacks/screenshots/WAZUH_MANAGER.png)
 *Figure 1: `wazuh-manager.service` confirmed active on the Linux host. The SIEM is operational and ready to ingest telemetry.*
 
 ### Endpoint Monitoring Configuration (Windows)
@@ -26,7 +26,7 @@ The Wazuh Agent was deployed on the Windows Server 2012 R2 Domain Controller to 
 - **Authentication Activity**: Success and failure events for brute force detection
 - **System Logs**: Service status and user activity for anomaly detection
 
-![Figure 2: Agent Registration & Deployment](./screenshots/WAZUH_ON_WIN.png)
+![Figure 2: Agent Registration & Deployment](./attacks/screenshots/WAZUH_ON_WIN.png)
 *Figure 2: Agent ID 001 - `CYBERSECVICTIM` successfully registered. `WazuhSvc` service running on the monitored Windows endpoint.*
 
 ### Detection Validation
@@ -39,7 +39,7 @@ Live attack simulations were executed to prove the monitoring stack can detect c
 - Event ID 4769 generated during TGS requests with `Ticket Encryption Type: 0x17` (RC4)
 - Weak encryption usage identified and forwarded to Wazuh for alerting
 
-![Figure 3: Kerberoasting Detection Evidence](./screenshots/KERBEROASTING_HASHCAT.png)
+![Figure 3: Kerberoasting Detection Evidence](./attacks/screenshots/KERBEROASTING_HASHCAT.png)
 *Figure 3: TGS ticket successfully extracted and cracked offline. Confirms the Kerberoasting attack path is viable and detectable via Event ID 4769.*
 
 #### Brute Force Activity (T1110)
@@ -49,7 +49,7 @@ Live attack simulations were executed to prove the monitoring stack can detect c
 - 154 failed login attempts correlated by Wazuh within 30 minutes
 - Rule 60122 "Logon failure - Unknown user or bad password" triggered
 
-![Figure 4: Brute Force Dashboard](./screenshots/WAZUH_EVENTS.png)
+![Figure 4: Brute Force Dashboard](./attacks/screenshots/WAZUH_EVENTS.png)
 *Figure 4: Wazuh dashboard for `CYBERSECLABDC` showing 297 total events, 154 authentication failures. The alert spike validates brute force detection.*
 
 ### Key Findings
