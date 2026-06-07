@@ -9,7 +9,7 @@ The Wazuh Manager is configured to trigger a custom script when Rule `60122` fir
 ![Figure 1: Active Response Configuration](./screenshots/OSSEC_ACTIVE_RESPONSE_CONFIG.png)
 *Figure 1: `ossec.conf` defines the `pfblock` command and links it to Rule 60122.*
 
-**Configuration breakdown:
+**Configuration breakdown**:
 ```xml
 <command>
   <name>pfblock</name>
@@ -24,30 +24,4 @@ The Wazuh Manager is configured to trigger a custom script when Rule `60122` fir
   <timeout>600</timeout>
 </active-response>
 
-<rules_id>60122</rules_id>: Triggers on brute force detection.
-<location>server</location>: The script runs on the Wazuh Manager itself.
-<timeout>600</timeout>: The IP is blocked for 10 minutes, then automatically unblocked.<executable>pfblock.sh</executable>: The script responsible for firewall interaction.** 
-
-### 2.Response Script: 
-
-/var/ossec/active-response/bin/pfblock.shThis Bash script receives the attacker's IP from Wazuh and uses SSH to execute easyrule on pfSense.
-
-![Figure 2: pfblock.sh Active Response Script](./screenshots/ACTIVE_RESPONSE_SCRIPT.png)
-*Figure 2: The script blocks the IP via `easyrule block` wan and logs the action. It auto-unblocks after the timeout.
-
-**Script logic:** 
-
-IP=$1: Wazuh passes the attacker's source IP as the first argument.
-ACTION=$2: Wazuh passes add to block, or delete to unblock after timeout.
-ssh admin@10.0.10.1 "easyrule block wan ${IP}": Connects to pfSense 10.0.10.1 and creates a firewall rule to drop all traffic from the attacker's IP.
-All actions are logged to /var/ossec/logs/active-responses.log for auditability.
-
-### 3. End-to-End Workflow
-
-Attack: Hydra from 10.0.20.102 generates multiple Event ID 4625 on the DC.
-Detection: Wazuh Agent forwards logs. Wazuh Manager correlates and triggers Rule 60122.
-Response: The Active Response module executes pfblock.sh add 10.0.20.102.
-Mitigation: pfSense instantly blocks 10.0.20.102. Attack is contained in < 3 seconds.
-Recovery: After 600 seconds, Wazuh executes pfblock.sh delete 10.0.20.102 to auto-unblock.
-
-Result: This closed-loop remediation turns the SIEM into an active defense system, reducing Mean Time to Respond (MTTR) from hours to seconds.
+<rules_id>60122</rules_id>: Triggers on brute force detection.<location>server</location>: The script runs on the Wazuh Manager itself.<timeout>600</timeout>: The IP is blocked for 10 minutes, then automatically unblocked.<executable>pfblock.sh</executable>: The script responsible for firewall interaction.
