@@ -9,7 +9,7 @@ The Wazuh Manager is configured to trigger a custom script when Rule `60122` fir
 ![Figure 1: Active Response Configuration](./screenshots/OSSEC_ACTIVE_RESPONSE_CONFIG.png)
 *Figure 1: `ossec.conf` defines the `pfblock` command and links it to Rule 60122.*
 
-**Configuration breakdown**:
+**Configuration breakdown:
 ```xml
 <command>
   <name>pfblock</name>
@@ -26,7 +26,7 @@ The Wazuh Manager is configured to trigger a custom script when Rule `60122` fir
 
 <rules_id>60122</rules_id>: Triggers on brute force detection.
 <location>server</location>: The script runs on the Wazuh Manager itself.
-<timeout>600</timeout>: The IP is blocked for 10 minutes, then automatically unblocked.<executable>pfblock.sh</executable>: The script responsible for firewall interaction.
+<timeout>600</timeout>: The IP is blocked for 10 minutes, then automatically unblocked.<executable>pfblock.sh</executable>: The script responsible for firewall interaction.** 
 
 ### 2.Response Script: 
 
