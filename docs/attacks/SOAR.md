@@ -10,6 +10,7 @@ The Wazuh Manager is configured to trigger a custom script when Rule 60122 fires
 
 *Figure 1: ossec.conf defines the pfblock command and links it to Rule 60122.*
 
+
 **Configuration breakdown:**
 
 <command>
@@ -37,6 +38,7 @@ This Bash script receives the attacker's IP from Wazuh and uses SSH to execute e
 ![Figure 2: pfblock.sh Active Response Script](./screenshots/ACTIVE_RESPONSE_SCRIPT.png)
 
 *Figure 2: The script blocks the IP via easyrule block wan and logs the action. It auto-unblocks after the timeout.*
+
 
 **Script logic:**
 1. IP=$1: Wazuh passes the attacker's source IP as the first argument.
