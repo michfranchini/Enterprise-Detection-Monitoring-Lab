@@ -35,16 +35,18 @@ The Wazuh Manager is configured to trigger a custom script when Rule 60122 fires
 
 This Bash script receives the attacker's IP from Wazuh and uses SSH to execute easyrule on pfSense.
 
-![Figure 2: pfblock.sh Active Response Script](./scripts/PFBLOCK.SH)
+[Figure 2: pfblock.sh Active Response Script](./scripts/PFBLOCK.SH)
 
-*Figure 2: The script blocks the IP via easyrule block wan and logs the action. It auto-unblocks after the timeout.*
+*Figure 2: The script blocks the attacker's IP via `easyrule block wan` and logs all actions. Wazuh automatically calls it with `delete` after the configured timeout.*
 
 
 **Script logic:**
-1. IP=$1: Wazuh passes the attacker's source IP as the first argument.
-2. ACTION=$2: Wazuh passes "add" to block, or "delete" to unblock after timeout.
-3. ssh admin@10.0.10.1 "easyrule block wan ${IP}": Connects to pfSense 10.0.10.1 and creates a firewall rule to drop all traffic from the attacker's IP.
-4. All actions are logged to /var/ossec/logs/active-responses.log for auditability.
+1.  `ACTION=$1`: Wazuh passes `add` to block, or `delete` to unblock after timeout.
+2.  `USER=$2`: Wazuh passes the username targeted by the brute-force attempt.
+3.  `IP=$3`: Wazuh passes the attacker's source IP as the third argument.
+4.  IP Validation: The script validates the IP using `awk` to ensure only valid IPv4 addresses `0-255` are accepted, preventing command injection.
+5.  `ssh admin@10.0.10.1 "easyrule block wan ${IP}"`: Connects to pfSense and creates a firewall rule to drop all traffic from the attacker's IP.
+6.  All actions and results are logged to `/var/ossec/logs/active-responses.log` for auditability.
 
 ### 3. End-to-End Workflow
 
