@@ -12,7 +12,7 @@
 
 This project simulates a segmented enterprise environment to study the complete defensive kill chain: **Attack → Detect → Respond**.
 
-Unlike classic SIEM labs, this one implements a custom **SOAR** layer: when Wazuh detects an attack, it automatically instructs the pfSense firewall to ban the attacker's IP. **Zero human intervention**.
+Unlike classic SIEM labs, this one implements a custom **SOAR-style automated response workflow** layer: when Wazuh detects an attack, it automatically instructs the pfSense firewall to ban the attacker's IP. **Zero human intervention**.
 
 **Goal**: Replicate the capabilities of a modern SOC, from log collection to automated response.
 
